@@ -1,0 +1,80 @@
+<% provide(:title, 'くじびきページ') %>
+<h1>くじをひけます</h1>
+<div class="row">
+  <div class="col-md-5">
+    <%= image_tag 'tihiro.png' %>
+  </div>
+  <div class="col-md-7">
+    <div class="text-center">
+      <button type="button" id="gatya" class="btn btn-warning">くじを引く</button>
+      <div id="image-area" style="i">
+
+      </div>
+      <% if current_user.flag %>
+      <% pic = current_user.result.to_s + ".jpg" %>
+      <div id="res-area">
+        <% if current_user.result == 0 %>
+          <h4 class="alert alert-success">おめでとうございます！ハーゲンダッツが当たりました！</h4>
+        <% elsif current_user.result == 1 %>
+          <h4 class="alert alert-success">おめでとうございます！ガリガリくんが当たりました！</h4>
+        <% else %>
+          <h4 class="alert alert-success">おめでとうございます！ジュースが当たりました！</h4>
+        <% end %>
+        <%= image_tag pic , :size => '300x300' %>
+      </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
+<script>
+  $(function(){
+
+    //　現在時間取得関数
+    var check = function(){
+      var data = new Date();
+      var hours = data.getHours();
+      return hours
+    }
+
+
+
+    var loa = function(){
+      window.location.reload()
+    }
+
+    // >15
+    if(check() > 0){
+    //if(1){
+      $("button").show();
+    } else {
+      $("button").hide();
+    }
+    $("#gatya").on("click", function(){
+      var rand = Math.floor( Math.random() * 3 );
+      // console.log("乱数 is "+rand);
+      if(gon.user_name.flag){
+        if(!$('#mes')[0]){
+          $("#image-area").append("<h4 id='mes' class='alert alert-warning'>ごめんなさい。一回のみガチャれます。</h4>");
+        }
+        return false;
+      }
+      $.ajax({
+        url: "http://localhost:3000/omikuzi",
+        type: 'post',
+        dataType:'json',
+        data: { name: gon.user_name.name, val: rand},
+      }).done(function(){
+        alert("save")
+      }).fail(function(){
+
+        $("#image-area").append("<img id='khin' src='" + '../assets/'+ rand + '.jpg' + "' width='10' heght='10'  >");
+        TweenMax.to('#khin', 1.0, { width:300,height:300, rotation: 360 });
+        setTimeout(loa(), 2000);
+        //$("#gatya").hide()
+      })
+    });
+
+
+  })
+</script>
